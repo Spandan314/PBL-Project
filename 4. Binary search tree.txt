@@ -1,0 +1,188 @@
+/*PRACTICAL NO 4*/
+/*
+Experiment No. 2 : Create binary search tree.Find height of the tree and
+print leaf nodes.
+Find mirror image, print original and mirror image using
+level-wise printing.
+*/
+
+#include <iostream>
+#include <queue>
+using namespace std;
+
+struct TreeNode {
+    int value;
+    TreeNode* left;
+    TreeNode* right;
+};
+
+class BST {
+    TreeNode* root;
+    
+    int getHeight(TreeNode* node) {
+        if(!node) return 0;
+        return 1 + max(getHeight(node->left), getHeight(node->right));
+    }
+    
+    void printLeaves(TreeNode* node) {
+        if(!node) return;
+        if(!node->left && !node->right) 
+            cout << node->value << " ";
+        printLeaves(node->left);
+        printLeaves(node->right);
+    }
+    
+    TreeNode* mirror(TreeNode* node) {
+        if(!node) return nullptr;
+        TreeNode* temp = node->left;
+        node->left = mirror(node->right);
+        node->right = mirror(temp);
+        return node;
+    }
+    
+    void levelOrder(TreeNode* node) {
+        if(!node) return;
+        queue<TreeNode*> q;
+        q.push(node);
+        
+        while(!q.empty()) {
+            int size = q.size();
+            while(size--) {
+                TreeNode* current = q.front();
+                q.pop();
+                cout << current->value << " ";
+                if(current->left) q.push(current->left);
+                if(current->right) q.push(current->right);
+            }
+            cout << endl;
+        }
+    }
+    
+    void preOrder(TreeNode* node) {
+        if(!node) return;
+        cout << node->value << " ";
+        preOrder(node->left);
+        preOrder(node->right);
+    }
+    
+    int countNodes(TreeNode* node) {
+        if(!node) return 0;
+        return 1 + countNodes(node->left) + countNodes(node->right);
+    }
+    
+    bool search(TreeNode* node, int val) {
+        if(!node) return false;
+        if(node->value == val) return true;
+        if(val < node->value) return search(node->left, val);
+        return search(node->right, val);
+    }
+    
+public:
+    BST() : root(nullptr) {}
+    
+    void insert(int val) {
+        TreeNode* newNode = new TreeNode{val, nullptr, nullptr};
+        if(!root) {
+            root = newNode;
+            return;
+        }
+        
+        TreeNode* current = root;
+        while(true) {
+            if(val < current->value) {
+                if(!current->left) {
+                    current->left = newNode;
+                    break;
+                }
+                current = current->left;
+            } else {
+                if(!current->right) {
+                    current->right = newNode;
+                    break;
+                }
+                current = current->right;
+            }
+        }
+    }
+    
+    void create() {
+        char choice;
+        do {
+            int val;
+            cout << "Enter value: ";
+            cin >> val;
+            insert(val);
+            cout << "Continue? (y/n): ";
+            cin >> choice;
+        } while(choice == 'y');
+    }
+    
+    void displayMenu() {
+        cout << "\n1. Create BST\n2. Mirror BST\n3. Print Leaf Nodes\n4. Get Height";
+        cout << "\n5. Preorder Traversal\n6. Find Minimum\n7. Count Nodes\n8. Search\n9. Exit";
+    }
+    
+    void run() {
+        int choice;
+        do {
+            displayMenu();
+            cout << "\nEnter choice: ";
+            cin >> choice;
+            
+            switch(choice) {
+                case 1:
+                    create();
+                    break;
+                case 2:
+                    cout << "\nOriginal Tree:\n";
+                    levelOrder(root);
+                    root = mirror(root);
+                    cout << "\nMirrored Tree:\n";
+                    levelOrder(root);
+                    break;
+                case 3:
+                    cout << "Leaf nodes: ";
+                    printLeaves(root);
+                    cout << endl;
+                    break;
+                case 4:
+                    cout << "Height: " << getHeight(root) << endl;
+                    break;
+                case 5:
+                    cout << "Preorder: ";
+                    preOrder(root);
+                    cout << endl;
+                    break;
+                case 6: {
+                    TreeNode* current = root;
+                    while(current && current->left) 
+                        current = current->left;
+                    if(current) 
+                        cout << "Minimum: " << current->value << endl;
+                    break;
+                }
+                case 7:
+                    cout << "Node count: " << countNodes(root) << endl;
+                    break;
+                case 8: {
+                    int val;
+                    cout << "Enter value to search: ";
+                    cin >> val;
+                    cout << (search(root, val) ? "Found" : "Not found") << endl;
+                    break;
+                }
+                case 9:
+                    cout << "Exiting...\n";
+                    break;
+                default:
+                    cout << "Invalid choice\n";
+            }
+        } while(choice != 9);
+    }
+};
+
+int main() {
+    BST tree;
+    tree.run();
+    return 0;
+}

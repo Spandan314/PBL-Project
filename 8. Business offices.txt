@@ -1,0 +1,92 @@
+/*PRACTICAL NO 8*/
+/* Shahrukh khan -SCA05*/
+/*You have a business with several offices; you want to lease phone lines to connect them
+up with each other; and the phone company charges different amounts of money to
+connect different pairs of cities. You want a set of lines that connects all your offices
+with a minimum total cost. Solve the problem by suggesting appropriate data structures.
+**
+
+#include <iostream>
+#include <climits>
+#include <vector>
+using namespace std;
+
+class PrimMST {
+private:
+    int vertexCount;
+    vector<vector<int>> graph;
+    vector<bool> visited;
+    int totalCost;
+
+    void initializeGraph() {
+        cout << "Enter number of vertices: ";
+        cin >> vertexCount;
+        
+        graph.resize(vertexCount, vector<int>(vertexCount, -1));
+        visited.resize(vertexCount, false);
+    }
+
+    void addEdges() {
+        char choice;
+        for (int i = 0; i < vertexCount; i++) {
+            for (int j = i + 1; j < vertexCount; j++) {
+                cout << "Add edge between " << i + 1 << " and " << j + 1 << "? (y/n): ";
+                cin >> choice;
+                
+                if (choice == 'y' || choice == 'Y') {
+                    cout << "Enter weight: ";
+                    cin >> graph[i][j];
+                    graph[j][i] = graph[i][j]; // Undirected graph
+                }
+            }
+        }
+    }
+
+public:
+    PrimMST() : totalCost(0) {
+        initializeGraph();
+        addEdges();
+    }
+
+    void findMST() {
+        // Start with first vertex
+        visited[0] = true;
+        cout << "\nMinimum Spanning Tree Edges:\n";
+
+        // Find (vertexCount-1) edges
+        for (int edgeCount = 0; edgeCount < vertexCount - 1; edgeCount++) {
+            int minWeight = INT_MAX;
+            int from = -1, to = -1;
+
+            // Find minimum weight edge from visited to unvisited vertices
+            for (int i = 0; i < vertexCount; i++) {
+                if (visited[i]) {
+                    for (int j = 0; j < vertexCount; j++) {
+                        if (!visited[j] && graph[i][j] != -1 && graph[i][j] < minWeight) {
+                            minWeight = graph[i][j];
+                            from = i;
+                            to = j;
+                        }
+                    }
+                }
+            }
+
+            if (from == -1 || to == -1) {
+                cout << "Graph is not connected!\n";
+                return;
+            }
+
+            visited[to] = true;
+            totalCost += minWeight;
+            cout << from + 1 << " -> " << to + 1 << " (Weight: " << minWeight << ")\n";
+        }
+
+        cout << "\nTotal Minimum Cost: " << totalCost << endl;
+    }
+};
+
+int main() {
+    PrimMST mst;
+    mst.findMST();
+    return 0;
+}

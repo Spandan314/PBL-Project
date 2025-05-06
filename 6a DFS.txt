@@ -1,0 +1,131 @@
+/*PRACTICAL NO 6A*/
+/* Shahrukh khan -SCA05*/
+/*Represent a given graph using adjacency matrix/list to perform DFS and using adjacency
+list to perform BFS. Use the map of the area around the college as the graph. Identify
+the prominent land marks as nodes and perform DFS and BFS on that
+**/
+
+#include <iostream>
+#include <queue>
+#include <stack>
+using namespace std;
+
+const int MAX_VERTICES = 10;
+
+class GraphTraversal {
+private:
+    int adjacencyMatrix[MAX_VERTICES][MAX_VERTICES] = {0};
+    int vertexCount;
+    
+    void resetVisitedArrays() {
+        for(int i = 0; i < MAX_VERTICES; i++) {
+            visited[i] = false;
+            inQueue[i] = false;
+            inStack[i] = false;
+        }
+    }
+    
+    bool visited[MAX_VERTICES] = {false};
+    bool inQueue[MAX_VERTICES] = {false};
+    bool inStack[MAX_VERTICES] = {false};
+
+public:
+    void createGraph() {
+        cout << "Enter number of vertices (max " << MAX_VERTICES << "): ";
+        cin >> vertexCount;
+        
+        int edgeCount;
+        cout << "Enter number of edges: ";
+        cin >> edgeCount;
+        
+        cout << "\nEnter edges (vertex pairs, 0-based indexing):\n";
+        for(int k = 0; k < edgeCount; k++) {
+            int i, j;
+            cin >> i >> j;
+            adjacencyMatrix[i][j] = 1;
+            adjacencyMatrix[j][i] = 1; // Undirected graph
+        }
+    }
+
+    void displayAdjacencyMatrix() {
+        cout << "\nAdjacency Matrix:\n";
+        for(int i = 0; i < vertexCount; i++) {
+            for(int j = 0; j < vertexCount; j++) {
+                cout << " " << adjacencyMatrix[i][j];
+            }
+            cout << endl;
+        }
+    }
+
+    void bfs(int startVertex) {
+        resetVisitedArrays();
+        queue<int> q;
+        
+        cout << "BFS Traversal: ";
+        cout << startVertex << " ";
+        visited[startVertex] = true;
+        q.push(startVertex);
+        
+        while(!q.empty()) {
+            int current = q.front();
+            q.pop();
+            
+            for(int neighbor = 0; neighbor < vertexCount; neighbor++) {
+                if(adjacencyMatrix[current][neighbor] == 1 && !visited[neighbor]) {
+                    cout << neighbor << " ";
+                    visited[neighbor] = true;
+                    q.push(neighbor);
+                }
+            }
+        }
+        cout << endl;
+    }
+
+    void dfs(int startVertex) {
+        resetVisitedArrays();
+        stack<int> s;
+        
+        cout << "DFS Traversal: ";
+        cout << startVertex << " ";
+        visited[startVertex] = true;
+        s.push(startVertex);
+        
+        while(!s.empty()) {
+            int current = s.top();
+            bool hasUnvisitedNeighbor = false;
+            
+            for(int neighbor = 0; neighbor < vertexCount; neighbor++) {
+                if(adjacencyMatrix[current][neighbor] == 1 && !visited[neighbor]) {
+                    cout << neighbor << " ";
+                    visited[neighbor] = true;
+                    s.push(neighbor);
+                    hasUnvisitedNeighbor = true;
+                    break;
+                }
+            }
+            
+            if(!hasUnvisitedNeighbor) {
+                s.pop();
+            }
+        }
+        cout << endl;
+    }
+};
+
+int main() {
+    GraphTraversal graph;
+    
+    graph.createGraph();
+    graph.displayAdjacencyMatrix();
+    
+    int startVertex;
+    cout << "\nEnter starting vertex for BFS (0-based): ";
+    cin >> startVertex;
+    graph.bfs(startVertex);
+    
+    cout << "\nEnter starting vertex for DFS (0-based): ";
+    cin >> startVertex;
+    graph.dfs(startVertex);
+    
+    return 0;
+}

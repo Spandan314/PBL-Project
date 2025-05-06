@@ -1,0 +1,105 @@
+/*PRACTICAL NO 9*/
+/* Shahrukh khan -SCA05*/
+/*Given sequence k = k1 <k2 < … <kn of n sorted keys, with a search probability pi for each
+key ki . Build the Binary search tree that has the least search cost given the access
+probability for each key?
+**
+
+#include<iostream>
+#include<climits>
+using namespace std;
+
+const int SIZE = 10;
+
+class OBST {
+    int p[SIZE], q[SIZE], a[SIZE];
+    int w[SIZE][SIZE], c[SIZE][SIZE], r[SIZE][SIZE];
+    int n;
+
+    int find_min(int i, int j) {
+        int min_val = INT_MAX, min_k;
+        for(int k = r[i][j-1]; k <= r[i+1][j]; k++) {
+            if(c[i][k-1] + c[k][j] < min_val) {
+                min_val = c[i][k-1] + c[k][j];
+                min_k = k;
+            }
+        }
+        return min_k;
+    }
+
+public:
+    void get_data() {
+        cout << "Optimal Binary Search Tree\nNodes: ";
+        cin >> n;
+        
+        cout << "Elements:\n";
+        for(int i=1; i<=n; i++) cin >> a[i];
+        
+        cout << "Success probabilities:\n";
+        for(int i=1; i<=n; i++) cin >> p[i];
+        
+        cout << "Failure probabilities:\n";
+        for(int i=0; i<=n; i++) cin >> q[i];
+    }
+
+    void build() {
+        for(int i=0; i<n; i++) {
+            w[i][i] = q[i];
+            r[i][i] = c[i][i] = 0;
+            
+            w[i][i+1] = q[i] + q[i+1] + p[i+1];
+            r[i][i+1] = i+1;
+            c[i][i+1] = w[i][i+1];
+        }
+        
+        w[n][n] = q[n];
+        r[n][n] = c[n][n] = 0;
+        
+        for(int m=2; m<=n; m++) {
+            for(int i=0; i<=n-m; i++) {
+                int j = i + m;
+                w[i][j] = w[i][j-1] + p[j] + q[j];
+                int k = find_min(i, j);
+                c[i][j] = w[i][j] + c[i][k-1] + c[k][j];
+                r[i][j] = k;
+            }
+        }
+    }
+
+    void print_tree() {
+        int queue[20], front = -1, rear = -1;
+        cout << "OBST Root: " << r[0][n] << "\nCost: " << c[0][n] 
+             << "\n\nNode\tLeft\tRight\n";
+             
+        queue[++rear] = 0; 
+        queue[++rear] = n;
+        
+        while(front != rear) {
+            int i = queue[++front];
+            int j = queue[++front];
+            int k = r[i][j];
+            
+            cout << k << "\t";
+            if(r[i][k-1]) {
+                cout << r[i][k-1];
+                queue[++rear] = i;
+                queue[++rear] = k-1;
+            }
+            cout << "\t";
+            if(r[k][j]) {
+                cout << r[k][j];
+                queue[++rear] = k;
+                queue[++rear] = j;
+            }
+            cout << "\n";
+        }
+    }
+};
+
+int main() {
+    OBST tree;
+    tree.get_data();
+    tree.build();
+    tree.print_tree();
+    return 0;
+}

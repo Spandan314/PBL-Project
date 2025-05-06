@@ -1,0 +1,78 @@
+/*PRACTICAL NO 12*/
+/* Shahrukh khan -SCA05*/
+/*Implement the Heap/Shell sort algorithm implemented in Java demonstrating heap/shell
+data structure with modularity of programming language
+
+#include <iostream>
+#include <string>
+
+template <typename T>
+class HeapSort {
+private:
+    T* data;
+    int originalLength;
+    int heapSize;
+
+    void heapify(int node) {
+        int maxNode = node;
+        int left = 2 * node + 1;
+        int right = 2 * node + 2;
+
+        if (left < heapSize && data[left] > data[maxNode])
+            maxNode = left;
+
+        if (right < heapSize && data[right] > data[maxNode])
+            maxNode = right;
+
+        if (maxNode != node) {
+            swap(node, maxNode);
+            heapify(maxNode);
+        }
+    }
+
+    void buildMaxHeap() {
+        for (int i = (heapSize / 2) - 1; i >= 0; i--)
+            heapify(i);
+    }
+
+    void swap(int i, int j) {
+        T temp = data[i];
+        data[i] = data[j];
+        data[j] = temp;
+    }
+
+public:
+    HeapSort(T* arr, int size) : data(arr), originalLength(size), heapSize(size) {}
+
+    void sort() {
+        buildMaxHeap();
+        for (int i = originalLength - 1; i > 0; i--) {
+            swap(0, i);
+            heapSize--;
+            heapify(0);
+        }
+    }
+
+    void printData() {
+        for (int i = 0; i < originalLength; i++)
+            std::cout << data[i] << " ";
+        std::cout << "\n";
+    }
+};
+
+int main() {
+    std::string data[] = {"Shivam", "Vivek", "Zevier", "Bhushan", "LaluPrasad", "Banti"};
+    int size = sizeof(data) / sizeof(data[0]);
+
+    HeapSort<std::string> sorter(data, size);
+
+    std::cout << "Original data:\n";
+    sorter.printData();
+
+    sorter.sort();
+
+    std::cout << "\nSorted data:\n";
+    sorter.printData();
+
+    return 0;
+}

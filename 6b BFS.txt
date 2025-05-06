@@ -1,0 +1,123 @@
+/*PRACTICAL NO 6B*/
+/* Shahrukh khan -SCA05*/
+/*Represent a given graph using adjacency matrix/list to perform DFS and using adjacency
+list to perform BFS. Use the map of the area around the college as the graph. Identify
+the prominent land marks as nodes and perform DFS and BFS on that
+**/
+
+#include <iostream>
+#include <vector>
+using namespace std;
+
+const int MAX_VERTICES = 10;
+
+class Graph {
+private:
+    struct Node {
+        int vertex;
+        Node* next;
+        Node(int v) : vertex(v), next(nullptr) {}
+    };
+
+    Node* adjacencyList[MAX_VERTICES];
+    bool visited[MAX_VERTICES];
+    int vertexCount;
+
+    void clearVisited() {
+        for (int i = 0; i < MAX_VERTICES; i++) {
+            visited[i] = false;
+        }
+    }
+
+public:
+    Graph() {
+        for (int i = 0; i < MAX_VERTICES; i++) {
+            adjacencyList[i] = nullptr;
+        }
+        clearVisited();
+        vertexCount = 0;
+    }
+
+    void addEdge(int v1, int v2) {
+        if (v1 >= MAX_VERTICES || v2 >= MAX_VERTICES) {
+            cout << "Invalid vertex! Max is " << MAX_VERTICES - 1 << endl;
+            return;
+        }
+
+        // Add edge v1->v2
+        Node* newNode = new Node(v2);
+        newNode->next = adjacencyList[v1];
+        adjacencyList[v1] = newNode;
+
+        // Add edge v2->v1 (undirected graph)
+        newNode = new Node(v1);
+        newNode->next = adjacencyList[v2];
+        adjacencyList[v2] = newNode;
+
+        vertexCount = max(vertexCount, max(v1, v2) + 1);
+    }
+
+    void createGraph() {
+        char choice;
+        int v1, v2;
+        
+        cout << "Building graph (enter vertices as 0-based)" << endl;
+        do {
+            cout << "Enter edge (two vertices separated by space): ";
+            cin >> v1 >> v2;
+            addEdge(v1, v2);
+            
+            cout << "Add another edge? (y/n): ";
+            cin >> choice;
+        } while (choice == 'y' || choice == 'Y');
+    }
+
+    void dfs(int start) {
+        if (start >= MAX_VERTICES || adjacencyList[start] == nullptr) {
+            cout << "Invalid starting vertex!" << endl;
+            return;
+        }
+
+        clearVisited();
+        cout << "DFS Traversal: ";
+        dfsUtil(start);
+        cout << endl;
+    }
+
+private:
+    void dfsUtil(int v) {
+        visited[v] = true;
+        cout << v << " ";
+
+        for (Node* neighbor = adjacencyList[v]; neighbor != nullptr; neighbor = neighbor->next) {
+            if (!visited[neighbor->vertex]) {
+                dfsUtil(neighbor->vertex);
+            }
+        }
+    }
+
+public:
+    void printAdjacencyList() {
+        cout << "\nAdjacency List:" << endl;
+        for (int i = 0; i < vertexCount; i++) {
+            cout << i << ": ";
+            for (Node* current = adjacencyList[i]; current != nullptr; current = current->next) {
+                cout << current->vertex << " -> ";
+            }
+            cout << "NULL" << endl;
+        }
+    }
+};
+
+int main() {
+    Graph g;
+    g.createGraph();
+    g.printAdjacencyList();
+
+    int startVertex;
+    cout << "\nEnter starting vertex for DFS: ";
+    cin >> startVertex;
+    g.dfs(startVertex);
+
+    return 0;
+}

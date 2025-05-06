@@ -1,0 +1,81 @@
+/*PRACTICAL NO 12*/
+/* Shahrukh khan -SCA05*/
+/*Implement the Heap/Shell sort algorithm implemented in Java demonstrating heap/shell
+data structure with modularity of programming language
+
+public class HeapSort<T extends Comparable<T>> {
+    private T[] data;
+    private int length;
+
+    public HeapSort(T[] data) {
+        this.data = data;
+        this.length = data.length;
+    }
+
+    public void buildMaxHeap() {
+        // Start from the last parent node
+        for (int i = (length / 2) - 1; i >= 0; i--) {
+            heapify(i);
+        }
+    }
+
+    private void heapify(int node) {
+        int maxNode = node;
+        int leftNode = 2 * node + 1;
+        int rightNode = 2 * node + 2;
+
+        // Compare with left child
+        if (leftNode < length && data[leftNode].compareTo(data[maxNode]) > 0) {
+            maxNode = leftNode;
+        }
+
+        // Compare with right child
+        if (rightNode < length && data[rightNode].compareTo(data[maxNode]) > 0) {
+            maxNode = rightNode;
+        }
+
+        // If max is not current node, swap and recursively heapify
+        if (maxNode != node) {
+            swap(node, maxNode);
+            heapify(maxNode);
+        }
+    }
+
+    public void sort() {
+        buildMaxHeap();
+        
+        // Extract elements from heap one by one
+        for (int i = length - 1; i > 0; i--) {
+            swap(0, i);    // Move current root to end
+            length--;       // Reduce heap size
+            heapify(0);     // Heapify the reduced heap
+        }
+    }
+
+    private void swap(int i, int j) {
+        T temp = data[i];
+        data[i] = data[j];
+        data[j] = temp;
+    }
+
+    public void printData() {
+        for (T item : data) {
+            System.out.print(item + " ");
+        }
+        System.out.println();
+    }
+
+    public static void main(String[] args) {
+        String[] dataToBeSorted = {"Shivam", "Vivek", "Zevier", "Bhushan", "LaluPrasad", "Banti"};
+        
+        HeapSort<String> sorter = new HeapSort<>(dataToBeSorted);
+        
+        System.out.println("Original Data:");
+        sorter.printData();
+
+        sorter.sort();
+
+        System.out.println("\nSorted Data:");
+        sorter.printData();
+    }
+}

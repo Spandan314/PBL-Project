@@ -1,0 +1,257 @@
+/*PRACTICAL NO 1*/
+/*Shahrukh khan -SCA05*/
+/*Consider telephone book database of N clients. Make use of a hash table
+implementation to quickly look up client‘s telephone number. Make use of
+two collision
+handling techniques and compare them using number of comparisons required
+to find a
+set of telephone numbers.
+
+class PhoneRecord:
+    def __init__(self):
+        self._name = None
+        self._number = None
+
+    def get_name(self):
+        return self._name
+
+    def get_number(self):
+        return self._number
+
+    def set_name(self, name):
+        self._name = name
+
+    def set_number(self, number):
+        self._number = number
+
+    def __str__(self):
+        return "Name: " + str(self.get_name()) + "\t\tNumber: " + str(self.get_number())
+
+class PhoneHashTableLinear:
+    def __init__(self):
+        self.size = int(input("Enter hash table size: "))
+        self.table = list(None for i in range(self.size))
+        self.count = 0
+        self.comparisons = 0
+
+    def is_full(self):
+        return self.count == self.size
+
+    def hash_func(self, element):
+        return element % self.size
+
+    def insert(self, record):
+        if self.is_full():
+            print("Table full")
+            return False
+
+        stored = False
+        pos = self.hash_func(record.get_number())
+
+        if self.table[pos] == None:
+            self.table[pos] = record
+            print(f"{record.get_name()} added at position {pos}")
+            stored = True
+            self.count += 1
+        else:
+            print(f"Collision for {record.get_name()} at {pos}")
+            while self.table[pos] != None:
+                pos += 1
+                if pos >= self.size:
+                    pos = 0
+            self.table[pos] = record
+            print(f"{record.get_name()} added at position {pos}")
+            stored = True
+            self.count += 1
+        return stored
+
+    def search(self, record):
+        found = False
+        pos = self.hash_func(record.get_number())
+        self.comparisons += 1
+
+        if self.table[pos] != None:
+            if self.table[pos].get_name() == record.get_name() and self.table[pos].get_number() == record.get_number():
+                found = True
+                print(f"Found at position {pos} with {1} comparisons")
+                return pos
+
+            pos += 1
+            if pos >= self.size-1:
+                pos = 0
+
+            while self.table[pos] != None or self.comparisons <= self.size:
+                if self.table[pos].get_name() == record.get_name() and self.table[pos].get_number() == record.get_number():
+                    found = True
+                    i = self.comparisons + 1
+                    print(f"Found at position {pos} with {i} comparisons")
+                    return pos
+                pos += 1
+                if pos >= self.size-1:
+                    pos = 0
+                self.comparisons += 1
+
+        if not found:
+            print("Not found")
+        return False
+
+    def show(self):
+        print("\n")
+        for i in range(self.size):
+            print(f"Position {i}: {str(self.table[i])}")
+        print(f"Total records: {self.count}")
+
+class PhoneHashTableDouble:
+    def __init__(self):
+        self.size = int(input("Enter hash table size: "))
+        self.table = list(None for i in range(self.size))
+        self.count = 0
+        self.comparisons = 0
+
+    def is_full(self):
+        return self.count == self.size
+
+    def hash1(self, element):
+        return element % self.size
+
+    def hash2(self, element):
+        return 5 - (element % 5)
+
+    def double_hash(self, record):
+        found = False
+        limit = self.size
+        i = 1
+        while i <= limit:
+            new_pos = (self.hash1(record.get_number()) + i * self.hash2(record.get_number())) % self.size
+            if self.table[new_pos] == None:
+                found = True
+                break
+            else:
+                i += 1
+        return found, new_pos
+
+    def insert(self, record):
+        if self.is_full():
+            print("Table full")
+            return False
+
+        pos = self.hash1(record.get_number())
+        if self.table[pos] == None:
+            self.table[pos] = record
+            print(f"{record.get_name()} added at position {pos}")
+            self.count += 1
+            return True
+        else:
+            print(f"Collision for {record.get_name()} at {pos}")
+            found, pos = self.double_hash(record)
+            if found:
+                self.table[pos] = record
+                self.count += 1
+                print(f"{record.get_name()} added at position {pos}")
+                return True
+        return False
+
+    def search(self, record):
+        found = False
+        pos = self.hash1(record.get_number())
+        self.comparisons += 1
+
+        if self.table[pos] != None:
+            if self.table[pos].get_name() == record.get_name():
+                print(f"Found at position {pos} with {1} comparisons")
+                return pos
+
+            limit = self.size
+            i = 1
+            while i <= limit:
+                pos = (self.hash1(record.get_number()) + i * self.hash2(record.get_number())) % self.size
+                self.comparisons += 1
+                if self.table[pos] != None:
+                    if self.table[pos].get_name() == record.get_name():
+                        found = True
+                        break
+                i += 1
+
+            if found:
+                print(f"Found at position {pos} with {i+1} comparisons")
+            else:
+                print("Not found")
+            return found
+
+    def show(self):
+        print("\n")
+        for i in range(self.size):
+            print(f"Position {i}: {str(self.table[i])}")
+        print(f"Total records: {self.count}")
+
+def get_record():
+    record = PhoneRecord()
+    name = input("Enter name: ")
+    number = int(input("Enter number: "))
+    record.set_name(name)
+    record.set_number(number)
+    return record
+
+def main():
+    option = 0
+    while option != 3:
+        print("************************")
+        print("1. Linear Probing      *")
+        print("2. Double Hashing      *")
+        print("3. Exit                *")
+        print("************************")
+        option = int(input("Select option: "))
+
+        if option > 3:
+            print("Invalid option")
+
+        if option == 1:
+            table = PhoneHashTableLinear()
+            choice = 0
+            while choice != 4:
+                print("************************")
+                print("1. Add Record          *")
+                print("2. Find Record         *")
+                print("3. Show Table          *")
+                print("4. Back                *")
+                print("************************")
+                choice = int(input("Select option: "))
+
+                if choice > 4:
+                    print("Invalid option")
+
+                if choice == 1:
+                    record = get_record()
+                    table.insert(record)
+                elif choice == 2:
+                    record = get_record()
+                    table.search(record)
+                elif choice == 3:
+                    table.show()
+
+        elif option == 2:
+            table = PhoneHashTableDouble()
+            choice = 0
+            while choice != 4:
+                print("************************")
+                print("1. Add Record          *")
+                print("2. Find Record         *")
+                print("3. Show Table          *")
+                print("4. Back                *")
+                print("************************")
+                choice = int(input("Select option: "))
+
+                if choice > 4:
+                    print("Invalid option")
+
+                if choice == 1:
+                    record = get_record()
+                    table.insert(record)
+                elif choice == 2:
+                    record = get_record()
+                    table.search(record)
+                elif choice == 3:
+                    table.show()
+
+if __name__ == "__main__":
+    main()

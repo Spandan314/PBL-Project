@@ -1,0 +1,91 @@
+/*PRACTICAL NO 3*/
+/*Shahrukh khan -SCA05*/
+/*C++ Program To read details of a book consists of chapters,
+*chapters consist of sections and sections consist of
+*subsections. Construct a tree and print the nodes.
+*Find the time and space requirements of your method.
+**/
+
+#include <iostream>
+#include <string>
+using namespace std;
+
+struct BookNode {
+    string title;
+    int count;
+    BookNode* children[10];
+};
+
+class BookTree {
+    BookNode* root;
+    
+public:
+    BookTree() {
+        root = nullptr;
+    }
+    
+    void build() {
+        root = new BookNode();
+        
+        cout << "Book title: ";
+        cin >> root->title;
+        
+        cout << "Chapters count: ";
+        cin >> root->count;
+        
+        for(int i = 0; i < root->count; i++) {
+            root->children[i] = new BookNode();
+            
+            cout << "Chapter " << i+1 << " title: ";
+            cin >> root->children[i]->title;
+            
+            cout << "Sections in " << root->children[i]->title << ": ";
+            cin >> root->children[i]->count;
+            
+            for(int j = 0; j < root->children[i]->count; j++) {
+                root->children[i]->children[j] = new BookNode();
+                
+                cout << "Section " << j+1 << " title: ";
+                cin >> root->children[i]->children[j]->title;
+            }
+        }
+    }
+    
+    void show() {
+        if(!root) return;
+        
+        cout << "\nBook: " << root->title << endl;
+        
+        for(int i = 0; i < root->count; i++) {
+            cout << "  Chapter " << i+1 << ": " << root->children[i]->title << endl;
+            cout << "  Sections:" << endl;
+            
+            for(int j = 0; j < root->children[i]->count; j++) {
+                cout << "    - " << root->children[i]->children[j]->title << endl;
+            }
+        }
+    }
+};
+
+int main() {
+    BookTree book;
+    int option;
+    
+    while(true) {
+        cout << "\n1. Build Book\n2. Show Book\n3. Exit\nChoose: ";
+        cin >> option;
+        
+        switch(option) {
+            case 1:
+                book.build();
+                break;
+            case 2:
+                book.show();
+                break;
+            case 3:
+                return 0;
+            default:
+                cout << "Invalid option" << endl;
+        }
+    }
+}

@@ -1,0 +1,110 @@
+/*PRACTICAL NO 5*/
+/*
+Construct an expression tree from the given prefix expression.
+eg .+--a*bc/def and traverse it using post order traversal(non recursive)
+and then delete the entire tree.
+
+
+#include <iostream>
+#include <stack>
+#include <cstring>
+using namespace std;
+
+struct TreeNode {
+    char data;
+    TreeNode* left;
+    TreeNode* right;
+    TreeNode(char val) : data(val), left(nullptr), right(nullptr) {}
+};
+
+class ExpressionTree {
+    string prefix;
+    TreeNode* root;
+    
+    bool isOperator(char c) {
+        return c == '+' || c == '-' || c == '*' || c == '/';
+    }
+    
+public:
+    ExpressionTree() : root(nullptr) {}
+    
+    void buildFromPrefix(const string& expression) {
+        prefix = expression;
+        stack<TreeNode*> nodeStack;
+        
+        // Process from right to left
+        for(int i = prefix.length() - 1; i >= 0; i--) {
+            char c = prefix[i];
+            TreeNode* newNode = new TreeNode(c);
+            
+            if(isOperator(c)) {
+                newNode->left = nodeStack.top();
+                nodeStack.pop();
+                newNode->right = nodeStack.top();
+                nodeStack.pop();
+            }
+            nodeStack.push(newNode);
+        }
+        root = nodeStack.top();
+    }
+    
+    void postOrderNonRecursive() {
+        if(!root) return;
+        
+        stack<TreeNode*> s1, s2;
+        s1.push(root);
+        
+        while(!s1.empty()) {
+            TreeNode* current = s1.top();
+            s1.pop();
+            s2.push(current);
+            
+            if(current->left) s1.push(current->left);
+            if(current->right) s1.push(current->right);
+        }
+        
+        cout << "Postfix Expression: ";
+        while(!s2.empty()) {
+            cout << s2.top()->data;
+            s2.pop();
+        }
+        cout << endl;
+    }
+    
+    void deleteTree() {
+        if(!root) return;
+        
+        stack<TreeNode*> nodeStack;
+        nodeStack.push(root);
+        
+        cout << "Deleting nodes: ";
+        while(!nodeStack.empty()) {
+            TreeNode* current = nodeStack.top();
+            nodeStack.pop();
+            
+            cout << current->data << " ";
+            
+            if(current->left) nodeStack.push(current->left);
+            if(current->right) nodeStack.push(current->right);
+            
+            delete current;
+        }
+        root = nullptr;
+        cout << "\nTree deleted successfully." << endl;
+    }
+    
+    void run() {
+        cout << "Enter prefix expression: ";
+        getline(cin, prefix);
+        
+        buildFromPrefix(prefix);
+        postOrderNonRecursive();
+        deleteTree();
+    }
+};
+
+int main() {
+    ExpressionTree et;
+    et.run();
+    return 0;
+}

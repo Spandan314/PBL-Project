@@ -1,0 +1,170 @@
+/*PRACTICAL NO 2*/
+/*Implement all the functions of a dictionary (ADT) using hashing and
+handle collisions
+using chaining with / without replacement.
+Data: Set of (key, value) pairs, Keys are mapped to values, Keys must be
+comparable,
+Keys must be unique. Standard Operations: Insert(key, value), Find(key),
+Delete(key
+
+class NumberSet:
+    def __init__(self, count):
+        self._elements = []
+        for i in range(count):
+            num = int(input(f"Enter number {i+1}: "))
+            self.add(num)
+
+    def get_elements(self):
+        return self._elements
+
+    def __str__(self):
+        result = "{ "
+        for i in range(len(self._elements)):
+            result += str(self._elements[i])
+            if i != len(self._elements) - 1:
+                result += " , "
+        result += " }"
+        return result
+
+    def __len__(self):
+        return len(self._elements)
+
+    def __contains__(self, num):
+        return num in self._elements
+
+    def is_empty(self):
+        return len(self._elements) == 0
+
+    def add(self, num):
+        if num not in self:
+            self._elements.append(num)
+
+    def remove(self, num):
+        if num in self._elements:
+            self._elements.remove(num)
+
+    def __eq__(self, other_set):
+        if len(self) != len(other_set):
+            return False
+        return self.is_subset(other_set)
+
+    def is_subset(self, other_set):
+        for num in other_set.get_elements():
+            if num not in self._elements:
+                return False
+        return True
+
+    def is_proper_subset(self, other_set):
+        return self.is_subset(other_set) and not other_set.is_subset(self)
+
+    def union(self, other_set):
+        new_set = NumberSet(0)
+        new_set._elements = self._elements.copy()
+        for num in other_set:
+            if num not in self._elements:
+                new_set.add(num)
+        return new_set
+
+    def intersect(self, other_set):
+        new_set = NumberSet(0)
+        for num in self._elements:
+            if num in other_set:
+                new_set.add(num)
+        return new_set
+
+    def difference(self, other_set):
+        new_set = NumberSet(0)
+        for num in self._elements:
+            if num not in other_set:
+                new_set.add(num)
+        return new_set
+
+    def __iter__(self):
+        return iter(self._elements)
+
+def create_number_set():
+    count = int(input("How many numbers in set? "))
+    return NumberSet(count)
+
+def main_menu():
+    print("\nSet A created")
+    set_a = create_number_set()
+    print(set_a)
+
+    while True:
+        print("\n1. Add number")
+        print("2. Remove number")
+        print("3. Check number")
+        print("4. Get size")
+        print("5. Intersection")
+        print("6. Union")
+        print("7. Difference")
+        print("8. Check subset")
+        print("9. Check proper subset")
+        print("10. Exit")
+
+        choice = int(input("Your choice: "))
+
+        if choice == 1:
+            num = int(input("Number to add: "))
+            set_a.add(num)
+            print(set_a)
+        elif choice == 2:
+            num = int(input("Number to remove: "))
+            set_a.remove(num)
+            print(set_a)
+        elif choice == 3:
+            num = int(input("Number to check: "))
+            if num in set_a:
+                print("Number exists")
+            else:
+                print("Number doesn't exist")
+            print(set_a)
+        elif choice == 4:
+            print(f"Set has {len(set_a)} numbers")
+        elif choice == 5:
+            print("Create Set B for intersection")
+            set_b = create_number_set()
+            result = set_a.intersect(set_b)
+            print(f"Set A: {set_a}")
+            print(f"Set B: {set_b}")
+            print(f"Intersection: {result}")
+        elif choice == 6:
+            print("Create Set B for union")
+            set_b = create_number_set()
+            result = set_a.union(set_b)
+            print(f"Set A: {set_a}")
+            print(f"Set B: {set_b}")
+            print(f"Union: {result}")
+        elif choice == 7:
+            print("Create Set B for difference")
+            set_b = create_number_set()
+            result = set_a.difference(set_b)
+            print(f"Set A: {set_a}")
+            print(f"Set B: {set_b}")
+            print(f"Difference: {result}")
+        elif choice == 8:
+            print("Create Set B for subset check")
+            set_b = create_number_set()
+            if set_b.is_subset(set_a):
+                print("Set B is subset of Set A")
+            else:
+                print("Set B is not subset of Set A")
+            print(f"Set A: {set_a}")
+            print(f"Set B: {set_b}")
+        elif choice == 9:
+            print("Create Set B for proper subset check")
+            set_b = create_number_set()
+            if set_b.is_proper_subset(set_a):
+                print("Set B is proper subset of Set A")
+            else:
+                print("Set B is not proper subset of Set A")
+            print(f"Set A: {set_a}")
+            print(f"Set B: {set_b}")
+        elif choice == 10:
+            break
+        else:
+            print("Invalid choice")
+
+if __name__ == "__main__":
+    main_menu()
